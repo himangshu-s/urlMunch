@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import errorHandler from "./middleware/error.middleware.js";
 import healthRoutes from "./routes/health.routes.js";
+import urlRoutes from "./routes/url.routes.js";
+import redirectRoutes from "./routes/redirect.routes.js";
 const app= express();
 
 app.use(helmet()); // Adds various HTTP security headers.
@@ -13,5 +15,7 @@ app.use(express.urlencoded({extended:true})); //Allows Express to parse URL-enco
 app.use(morgan("dev")); // Logs incoming HTTP requests
 app.use(errorHandler);
 app.use("/api",healthRoutes);
+app.use("/api/urls", urlRoutes);
+app.use("/", redirectRoutes);
 
 export default app;
