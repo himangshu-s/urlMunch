@@ -6,6 +6,7 @@ import errorHandler from "./middleware/error.middleware.js";
 import healthRoutes from "./routes/health.routes.js";
 import urlRoutes from "./routes/url.routes.js";
 import redirectRoutes from "./routes/redirect.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 const app= express();
 
 app.use(helmet()); // Adds various HTTP security headers.
@@ -17,5 +18,6 @@ app.use(errorHandler);
 app.use("/api",healthRoutes);
 app.use("/api/urls", urlRoutes);
 app.use("/", redirectRoutes);
+app.use("/api/auth", authRoutes);
 
 export default app;
