@@ -24,4 +24,19 @@ const registerSchema = z.object({
     .max(100, "Password cannot exceed 100 characters"),
 });
 
-export { registerSchema };
+const loginSchema = z.object({
+  email: z
+    .string({
+      error: "Email is required",
+    })
+    .trim()
+    .email("Please provide a valid email"),
+
+  password: z
+    .string({
+      error: "Password is required",
+    })
+    .min(1, "Password is required"),
+});
+
+export { registerSchema,loginSchema };

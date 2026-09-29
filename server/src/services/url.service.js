@@ -3,7 +3,7 @@ import generateShortCode from "../utils/generateShortCode.js";
 import reservedAliases from "../utils/reservedAliases.js";
 import ApiError from "../utils/ApiError.js";
 // this is for when someone sends POST req
-const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null) => {
+const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null,userId) => {
     if (customAlias && reservedAliases.has(customAlias.toLowerCase())) {
   throw new ApiError(400, "This custom alias is reserved");
 }
@@ -20,6 +20,7 @@ const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null) => 
     originalUrl,
     shortCode,
     expiresAt,
+    user:userId,
   });
 
 

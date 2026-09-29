@@ -4,7 +4,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 const createUrl= asyncHandler(async(req,res)=>{
     const {originalUrl, expiresAt, customAlias} = req.body;
-    const url= await createShortUrl(originalUrl, expiresAt, customAlias);
+    const url= await createShortUrl(originalUrl, expiresAt, customAlias, req.user.userId,);
 
     return res
     .status(201)
