@@ -1,4 +1,4 @@
-import { registerUser,loginUser , refreshAccessToken} from "../services/auth.service.js";
+import { registerUser,loginUser , refreshAccessToken, logoutUser,logoutAllUsers} from "../services/auth.service.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 const register = asyncHandler(async (req, res) => {
@@ -87,7 +87,45 @@ const refresh = asyncHandler(async (req, res) => {
     );
 });
 
-export { register, login, refresh };
+const logout = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  await logoutUser(refreshToken);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, null, "Logged out successfully"),
+    );
+});
+
+const logoutAll = asyncHandler(async (req, res) => {
+  await logoutAllUsers(req.user.userId);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        null,
+        "Logged out from all devices",
+      ),
+    );
+});
+
+export { register, login, refresh,logout,logoutAll };
 
 /*. Now both registration and login have the same authentication behavior:
 

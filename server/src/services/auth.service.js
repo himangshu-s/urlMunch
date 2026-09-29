@@ -153,7 +153,25 @@ const refreshAccessToken = async (refreshToken) => {
   };
 };
 
-export {registerUser,loginUser, refreshAccessToken,};
+const logoutUser = async (refreshToken) => {
+  if (!refreshToken) {
+    return;
+  }
+
+  const tokenHash = hashToken(refreshToken);
+
+  await RefreshToken.deleteOne({
+    tokenHash,
+  });
+};
+
+const logoutAllUsers = async (userId) => {
+  await RefreshToken.deleteMany({
+    user: userId,
+  });
+};
+
+export {registerUser,loginUser, refreshAccessToken,logoutUser,logoutAllUsers};
 
 /*Why .toString() on _id?
 

@@ -15,11 +15,20 @@ const refreshTokenSchema = new mongoose.Schema(
       required: true,
     },
 
-    expiresAt: {
-      type: Date,
-      required: true,
-      index: true,
-    },
+   expiresAt: {
+  type: Date,
+  required: true,
+  index: {
+    expireAfterSeconds: 0,
+    /*. What does this mean?
+
+MongoDB sees:
+
+expiresAt = 10:00
+
+and automatically removes the document after that time.*/
+  },
+},
   },
   {
     timestamps: true,
