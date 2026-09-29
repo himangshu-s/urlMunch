@@ -1,17 +1,27 @@
 import Url from "../models/url.model.js";
 import generateShortCode from "../utils/generateShortCode.js";
+import reservedAliases from "../utils/reservedAliases.js";
+import ApiError from "../utils/ApiError.js";
 // this is for when someone sends POST req
-const createShortUrl = async (originalUrl) => {
+const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null) => {
+    if (customAlias && reservedAliases.has(customAlias.toLowerCase())) {
+  throw new ApiError(400, "This custom alias is reserved");
+}
   let shortCode;
+  if(customAlias){
+    shortCode= customAlias;
+  } else{
 
   do {
     shortCode = generateShortCode();
   } while (await Url.exists({ shortCode }));  // this is do while loop
-
+  }
   const url = await Url.create({
     originalUrl,
     shortCode,
+    expiresAt,
   });
+
 
   return url;
 };

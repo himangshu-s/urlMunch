@@ -3,8 +3,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const createUrl= asyncHandler(async(req,res)=>{
-    const {originalUrl} = req.body;
-    const url= await createShortUrl(originalUrl);
+    const {originalUrl, expiresAt, customAlias} = req.body;
+    const url= await createShortUrl(originalUrl, expiresAt, customAlias);
 
     return res
     .status(201)

@@ -1,10 +1,50 @@
 const errorHandler= (err, req,res,next)=>{
-    const statusCode = err.statusCode || 500;
-   
+ let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+  let errors = err.errors || [];
+
+// MongoDB defines error codes.
+//When MongoDB rejects an operation because of a duplicate value in a unique index, it returns an error with code:
+//11000.  and since shortcode is unique so. 
+
+// Mongoose receives that database error and gives it to your Node.js application as an Error object.
+/*It will contain information roughly like:
+
+{
+  name: "MongoServerError",
+  code: 11000,
+  ...
+} 
+  So:
+
+err.code
+
+is 11000.*/
+   if (err.code === 11000) {
+    statusCode = 409;
+    message = "Short code already exists";
+  }
+/*What's 11000?
+
+MongoDB uses error code:
+
+11000
+
+for a duplicate key violation.
+
+Our schema says:
+
+unique: true
+
+so MongoDB effectively says:
+
+"You are trying to insert a value that already exists in this unique index." */
+
+
     res.status(statusCode).json({
         success: false,
-        message:err.message || "Internal server error",
-        errors:err.errors || [],
+        message,
+        errors,
 
 
     })

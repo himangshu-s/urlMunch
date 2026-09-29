@@ -8,6 +8,9 @@ const redirectToOriginalUrl= asyncHandler(async(req,res)=>{
     if(!url){
         throw new ApiError(404, "short url not found");
     }
+    if(url.expiresAt && url.expiresAt <=new Date()){ // current time or current date
+         throw new ApiError(410, "Short URL has expired");
+    }
     url.clicks +=1;
     await url.save();
     return res.redirect(url.originalUrl);
