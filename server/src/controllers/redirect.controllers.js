@@ -2,6 +2,7 @@ import { getUrlByShortCode } from "../services/url.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import {getCache,setCache,} from "../services/cache.service.js";
+import { recordClickEvent } from "../services/analytics.service.js";
 
 const redirectToOriginalUrl= asyncHandler(async(req,res)=>{
     const {shortCode}= req.params;
@@ -11,9 +12,11 @@ const redirectToOriginalUrl= asyncHandler(async(req,res)=>{
 
   let originalUrl = await getCache(cacheKey);
 
-  if (originalUrl) {
-    return res.redirect(originalUrl);
-  }
+if (originalUrl) {
+  await recordClickEvent(shortCode);
+
+  return res.redirect(originalUrl);
+}
 
   const url = await getUrlByShortCode(shortCode);
 
@@ -33,10 +36,9 @@ const redirectToOriginalUrl= asyncHandler(async(req,res)=>{
     3600,
   );
 
-  url.clicks += 1;
-  await url.save();
+  await recordClickEvent(shortCode);
 
-  return res.redirect(originalUrl);
+return res.redirect(originalUrl);
 });
 
 export {redirectToOriginalUrl};
