@@ -1,4 +1,4 @@
-import { registerUser,loginUser , refreshAccessToken, logoutUser,logoutAllUsers} from "../services/auth.service.js";
+import { registerUser,loginUser , refreshAccessToken, logoutUser,logoutAllUsers,  getCurrentUser,} from "../services/auth.service.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 const register = asyncHandler(async (req, res) => {
@@ -125,7 +125,16 @@ const logoutAll = asyncHandler(async (req, res) => {
     );
 });
 
-export { register, login, refresh,logout,logoutAll };
+
+const getMe = asyncHandler(async (req, res) => {
+  const user = await getCurrentUser(req.user.userId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User fetched successfully"));
+});
+
+export { register, login, refresh,logout,logoutAll ,getMe,};
 
 /*. Now both registration and login have the same authentication behavior:
 

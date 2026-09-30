@@ -1,5 +1,5 @@
 import express from "express";
-import { register,login, refresh,logout,  logoutAll, } from "../controllers/auth.controllers.js";
+import { register,login, refresh,logout,  logoutAll,  getMe, } from "../controllers/auth.controllers.js";
 import validate from "../middleware/validate.middleware.js";
 import { registerSchema,loginSchema } from "../validators/auth.validator.js";
 import authenticate from "../middleware/auth.middleware.js";
@@ -26,6 +26,7 @@ router.post("/login", loginRateLimit,validate(loginSchema), login);
 router.post("/refresh", refreshRateLimit, refresh);
 router.post("/logout", logout);
 router.post("/logout-all", authenticate, logoutAll);
+router.get("/me", authenticate, getMe);
 export default router;
 
 /*. Access token expires

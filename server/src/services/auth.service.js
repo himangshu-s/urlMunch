@@ -171,7 +171,33 @@ const logoutAllUsers = async (userId) => {
   });
 };
 
-export {registerUser,loginUser, refreshAccessToken,logoutUser,logoutAllUsers};
+
+
+const getCurrentUser = async (userId) => {
+  const user = await User.findById(userId).select(
+    "_id username email createdAt",
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return {
+    id: user._id,
+    username: user.username,
+    email: user.email,
+    createdAt: user.createdAt,
+  };
+};
+
+export {
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+  logoutUser,
+  logoutAllUsers,
+  getCurrentUser,
+};
 
 /*Why .toString() on _id?
 
