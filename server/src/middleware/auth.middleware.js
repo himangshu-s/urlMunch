@@ -109,4 +109,45 @@ Now downstream code can do:
 
 req.user.userId
 
-to know which authenticated user made the request. */
+to know which authenticated user made the request.
+
+
+
+How does JavaScript/Express know that req is allowed to have a new property called user?
+
+And the answer is actually pretty simple and important:
+
+req is just a JavaScript object
+
+Express creates the req object and passes it into your middleware:
+
+const authenticate = (req, res, next) => {
+
+At that point, req is an object with many properties that Express has already provided:
+
+req.headers
+req.body
+req.params
+req.query
+...
+
+But JavaScript objects are generally dynamic.
+
+So you can do:
+
+req.user = decoded;
+
+even though Express didn't originally define a user property.
+
+It's basically the same as:
+
+const person = {
+  name: "Himangshu"
+};
+
+person.age = 22;
+
+You didn't declare age when creating the object, but JavaScript allows you to add it
+
+
+*/

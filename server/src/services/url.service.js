@@ -26,14 +26,74 @@ const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null,user
 
   return url;
 };
-// this is for when someomne sends GEt req, like months after creating the url , i asked to get it , in that terms. 
+// this is for when someomne sends GET req, like months after creating the url , i asked to get it , in that terms. 
 const getUrlByShortCode = async (shortCode) => {
   const url = await Url.findOne({ shortCode });
 
   return url;
 };
 
-export { createShortUrl,getUrlByShortCode };
+
+// gvies all urls of that logged in user
+const getUserUrls = async (userId) => {
+  const urls = await Url.find({ user: userId })
+    .sort({ createdAt: -1 });
+
+  return urls;
+};
+
+// gives that particular url to the logged in user
+const getUserUrlById = async (urlId, userId) => {
+  const url = await Url.findOne({
+    _id: urlId,
+    user: userId,
+  });
+
+  if (!url) {
+    throw new ApiError(404, "URL not found");
+  }
+
+  return url;
+};
+
+
+const updateUserUrl = async (urlId, userId, updates) => {
+  const url = await Url.findOneAndUpdate(
+    {
+      _id: urlId,
+      user: userId,
+    },
+     {
+      $set: updates,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  if (!url) {
+    throw new ApiError(404, "URL not found");
+  }
+
+  return url;
+};
+
+
+const deleteUserUrl = async (urlId, userId) => {
+  const url = await Url.findOneAndDelete({
+    _id: urlId,
+    user: userId,
+  });
+
+  if (!url) {
+    throw new ApiError(404, "URL not found");
+  }
+
+  return url;
+};
+
+export { createShortUrl,getUrlByShortCode, getUserUrls, getUserUrlById,updateUserUrl,deleteUserUrl, };
 
 /* The controller will essentially say:
 

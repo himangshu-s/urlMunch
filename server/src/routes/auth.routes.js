@@ -9,7 +9,7 @@ router.post("/register", validate(registerSchema), register);
 router.post("/login", validate(loginSchema), login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
-router.post("/logout-all", authenticate, logoutAll);
+router.post("/logout-all", authenticate, logout);
 export default router;
 
 /*. Access token expires
