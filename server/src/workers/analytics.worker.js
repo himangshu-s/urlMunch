@@ -1,46 +1,38 @@
 import { redisClient } from "../config/redis.js";
 import {
   ANALYTICS_QUEUE,
-  ANALYTICS_RETRY_QUEUE,
-  addClickEventToRetryQueue,
   addClickEventToDeadLetterQueue,
 } from "../queues/analytics.queue.js";
 import ClickEvent from "../models/clickEvent.model.js";
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 5000;
-
-const sleep = (ms) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-};
 
 const processClickEvent = async (clickEvent) => {
-  try {
-    await ClickEvent.create(clickEvent);
-
-    console.log(
-      `Click event processed: ${clickEvent.shortCode}`,
-    );
-  } catch (error) {
-    console.error(
-      `Failed to process click event: ${clickEvent.shortCode}`,
-      error.message,
-    );
-
-    if ((clickEvent.retryCount || 0) < MAX_RETRIES) {
-      await addClickEventToRetryQueue(clickEvent);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await ClickEvent.create(clickEvent);
 
       console.log(
-        `Click event moved to retry queue: ${clickEvent.shortCode}`,
+        `Click event processed: ${clickEvent.shortCode}`,
       );
-    } else {
-      await addClickEventToDeadLetterQueue(clickEvent);
 
+      return;
+    } catch (error) {
       console.error(
-        `Click event moved to dead-letter queue: ${clickEvent.shortCode}`,
+        `Failed to process click event: ${clickEvent.shortCode} | Attempt ${attempt}`,
+        error.message,
       );
+
+      if (attempt === MAX_RETRIES) {
+        await addClickEventToDeadLetterQueue({
+          ...clickEvent,
+          failedAfterAttempts: MAX_RETRIES,
+        });
+
+        console.error(
+          `Click event moved to dead-letter queue: ${clickEvent.shortCode}`,
+        );
+      }
     }
   }
 };
@@ -62,26 +54,20 @@ const startAnalyticsWorker = async () => {
 
 export default startAnalyticsWorker;
 
+/*.Now our architecture is much cleaner
+                 Main Queue
+                     │
+                     ▼
+                   Worker
+                     │
+                  MongoDB
+                 /       \
+              success    failure
+                │           │
+                ▼           ▼
+              Done      retry × 3
+                            │
+                            ▼
+                     Dead-letter Queue
 
-/* finally the worker consume both the main queue and retry queue, but we need to do it carefully. 
-
-also -
-We don't want this:
-
-MongoDB fails
-   ↓
-Retry queue
-   ↓
-immediately retry
-   ↓
-MongoDB fails
-   ↓
-retry
-   ↓
-retry
-   ↓
-💥
-
-Instead, we'll give retries a small delay.
-
-*/
+No scheduler. No second retry queue. No delayed-job machinery. */

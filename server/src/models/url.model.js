@@ -33,6 +33,7 @@ const urlSchema= new mongoose.Schema(
         timestamps:true,
     }
 )
+urlSchema.index({ user: 1, createdAt: -1 });
 
 const Url= mongoose.model("Url", urlSchema);
 export default Url;

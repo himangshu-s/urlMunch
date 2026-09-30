@@ -1,15 +1,31 @@
 import express from "express";
-import { register,login, refresh,logout } from "../controllers/auth.controllers.js";
+import { register,login, refresh,logout,  logoutAll, } from "../controllers/auth.controllers.js";
 import validate from "../middleware/validate.middleware.js";
 import { registerSchema,loginSchema } from "../validators/auth.validator.js";
 import authenticate from "../middleware/auth.middleware.js";
+import rateLimit from "../middleware/rateLimit.middleware.js";
 const router = express.Router();
+const loginRateLimit = rateLimit({
+  windowInSeconds: 60,
+  maxRequests: 5,
+  keyPrefix: "rate-limit:login",
+});
+const registerRateLimit = rateLimit({
+  windowInSeconds: 60,
+  maxRequests: 3,
+  keyPrefix: "rate-limit:register",
+});
+const refreshRateLimit = rateLimit({
+  windowInSeconds: 60,
+  maxRequests: 20,
+  keyPrefix: "rate-limit:refresh",
+});
 
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
-router.post("/refresh", refresh);
+router.post("/register",registerRateLimit, validate(registerSchema), register);
+router.post("/login", loginRateLimit,validate(loginSchema), login);
+router.post("/refresh", refreshRateLimit, refresh);
 router.post("/logout", logout);
-router.post("/logout-all", authenticate, logout);
+router.post("/logout-all", authenticate, logoutAll);
 export default router;
 
 /*. Access token expires

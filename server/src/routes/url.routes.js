@@ -4,9 +4,15 @@ import validate from "../middleware/validate.middleware.js";
 import { createUrlSchema } from "../validators/url.validator.js";
 import authenticate from "../middleware/auth.middleware.js";
 import { updateUrlSchema } from "../validators/url-update.validator.js";
-
+import rateLimit from "../middleware/rateLimit.middleware.js";
 const router= express.Router();
-router.post("/",authenticate,validate(createUrlSchema),createUrl);
+
+const createUrlRateLimit = rateLimit({
+  windowInSeconds: 60,
+  maxRequests: 30,
+  keyPrefix: "rate-limit:create-url",
+});
+router.post("/",authenticate,createUrlRateLimit,validate(createUrlSchema),createUrl);
 router.get("/",authenticate,getMyUrls,);
 router.get( "/:id",authenticate,getMyUrlById,);
 router.patch("/:id", authenticate,validate(updateUrlSchema),updateUrl);

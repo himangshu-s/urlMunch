@@ -1,23 +1,27 @@
+import {
+  getCache,
+  setCache,
+} from "../services/cache.service.js";
 import { getUrlByShortCode } from "../services/url.service.js";
+import { recordClickEvent } from "../services/analytics.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
-import {getCache,setCache,} from "../services/cache.service.js";
-import { recordClickEvent } from "../services/analytics.service.js";
 
-const redirectToOriginalUrl= asyncHandler(async(req,res)=>{
-    const {shortCode}= req.params;
-    //const url= await getUrlByShortCode(shortCode);\
-    // now we will be using redis caching
-    const cacheKey = `url:${shortCode}`;
+const redirectToOriginalUrl = asyncHandler(async (req, res) => {
+  const { shortCode } = req.params;
+
+  const cacheKey = `url:${shortCode}`;
 
   let originalUrl = await getCache(cacheKey);
 
-if (originalUrl) {
-  await recordClickEvent(shortCode);
+  // Cache hit
+  if (originalUrl) {
+    await recordClickEvent(shortCode);
 
-  return res.redirect(originalUrl);
-}
+    return res.redirect(originalUrl);
+  }
 
+  // Cache miss
   const url = await getUrlByShortCode(shortCode);
 
   if (!url) {
@@ -38,7 +42,7 @@ if (originalUrl) {
 
   await recordClickEvent(shortCode);
 
-return res.redirect(originalUrl);
+  return res.redirect(originalUrl);
 });
 
-export {redirectToOriginalUrl};
+export { redirectToOriginalUrl };
