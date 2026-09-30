@@ -2,6 +2,8 @@ import Url from "../models/url.model.js";
 import generateShortCode from "../utils/generateShortCode.js";
 import reservedAliases from "../utils/reservedAliases.js";
 import ApiError from "../utils/ApiError.js";
+import {getCache,setCache,} from "./cache.service.js";
+import { deleteCache } from "./cache.service.js";
 // this is for when someone sends POST req
 const createShortUrl = async (originalUrl, expiresAt=null,customAlias= null,userId) => {
     if (customAlias && reservedAliases.has(customAlias.toLowerCase())) {
@@ -76,6 +78,8 @@ const updateUserUrl = async (urlId, userId, updates) => {
     throw new ApiError(404, "URL not found");
   }
 
+  await deleteCache(`url:${url.shortCode}`);
+
   return url;
 };
 
@@ -89,6 +93,7 @@ const deleteUserUrl = async (urlId, userId) => {
   if (!url) {
     throw new ApiError(404, "URL not found");
   }
+    await deleteCache(`url:${url.shortCode}`);
 
   return url;
 };
