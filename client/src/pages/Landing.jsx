@@ -2,65 +2,64 @@ import { Link } from "react-router-dom";
 
 function Landing() {
   return (
-    <main className="landing">
-      <nav className="navbar">
-        <div className="logo">urlMunch</div>
+    <main className="landing-page">
+      <nav className="landing-nav">
+        <div className="landing-logo">urlMunch</div>
 
-        <div className="nav-actions">
-          <Link to="/login" className="button button-secondary">
-  Login
-</Link>
+        <div className="landing-nav-actions">
+          <Link to="/login" className="landing-link">
+            Login
+          </Link>
 
-<Link to="/register" className="button button-primary">
-  Get Started
-</Link>
+          <Link to="/register" className="button button-primary">
+            Get started
+          </Link>
         </div>
       </nav>
 
-      <section className="hero">
-        <div className="hero-content">
-          <p className="eyebrow">URL SHORTENER</p>
+      <section className="landing-hero">
+        <div className="landing-content">
+          <p className="landing-label">URL SHORTENER</p>
 
-          <h1>Turn long URLs into short links.</h1>
+          <h1>
+            Short links.
+            <br />
+            Nothing unnecessary.
+          </h1>
 
-          <p className="hero-description">
-            Create, manage, and track your short links from one
-            simple dashboard.
+          <p className="landing-description">
+            Create, manage, and track short URLs from one simple dashboard.
           </p>
 
-          <div className="url-form">
-            <input
-              type="url"
-              placeholder="Paste your long URL"
-            />
+          <div className="landing-actions">
+            <Link to="/register" className="button button-primary">
+              Create an account
+            </Link>
 
-            <button className="button button-primary">
-              Shorten
-            </button>
+            <Link to="/login" className="button button-secondary">
+              Login
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="features">
-        <div className="feature">
-          <h3>Short links</h3>
-          <p>
-            Create compact URLs that are easy to share.
-          </p>
+      <section className="landing-features">
+        <div className="landing-feature">
+          <h3>Custom links</h3>
+
+          <p>Create a short URL with your own alias when you need one.</p>
         </div>
 
-        <div className="feature">
-          <h3>Custom aliases</h3>
-          <p>
-            Use your own short code when you need a memorable link.
-          </p>
+        <div className="landing-feature">
+          <h3>Link management</h3>
+
+          <p>View, edit, and delete the short URLs you've created.</p>
         </div>
 
-        <div className="feature">
-          <h3>Analytics</h3>
-          <p>
-            Track clicks on the links you create.
-          </p>
+        <div className="landing-feature">
+          <h3>Click analytics</h3>
+
+          <p>Track visits to your short URLs from the dashboard.</p>
         </div>
       </section>
     </main>

@@ -5,6 +5,7 @@ import { createUrlSchema } from "../validators/url.validator.js";
 import authenticate from "../middleware/auth.middleware.js";
 import { updateUrlSchema } from "../validators/url-update.validator.js";
 import rateLimit from "../middleware/rateLimit.middleware.js";
+import { getUrlAnalytics } from "../controllers/analytics.controller.js";
 const router= express.Router();
 
 const createUrlRateLimit = rateLimit({
@@ -14,9 +15,11 @@ const createUrlRateLimit = rateLimit({
 });
 router.post("/",authenticate,createUrlRateLimit,validate(createUrlSchema),createUrl);
 router.get("/",authenticate,getMyUrls,);
+router.get("/:id/analytics", authenticate, getUrlAnalytics);
 router.get( "/:id",authenticate,getMyUrlById,);
 router.patch("/:id", authenticate,validate(updateUrlSchema),updateUrl);
 router.delete("/:id",authenticate,deleteUrl,);
+
 export default router;
 
 /* We're going to mount this router under:

@@ -1,8 +1,21 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { logoutUser } from "../services/auth.service";
 
 function DashboardLayout() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout failed:", error.response?.data || error.message);
+    } finally {
+      logout();
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="dashboard-layout">
@@ -25,7 +38,7 @@ function DashboardLayout() {
           <div className="dashboard-user">
             <span>{user?.username}</span>
 
-            <button className="button button-secondary">
+            <button className="button button-secondary" onClick={handleLogout}>
               Logout
             </button>
           </div>

@@ -1,30 +1,33 @@
-import { createContext, useContext,useEffect, useState } from "react";
-import { refreshAccessToken, getCurrentUser, } from "../services/auth.service";
+import { createContext, useContext, useEffect, useState } from "react";
+import { refreshAccessToken, getCurrentUser } from "../services/auth.service";
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
- useEffect(() => {
-  const restoreSession = async () => {
-    try {
-      const data = await refreshAccessToken();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const data = await refreshAccessToken();
 
-      const newAccessToken = data.data.accessToken;
+        const newAccessToken = data.data.accessToken;
 
-      setAccessToken(newAccessToken);
+        setAccessToken(newAccessToken);
 
-      const userData = await getCurrentUser(newAccessToken);
+        const userData = await getCurrentUser(newAccessToken);
 
-      setUser(userData.data);
-    } catch (error) {
-      setAccessToken(null);
-      setUser(null);
-    }
-  };
+        setUser(userData.data);
+      } catch (error) {
+        setAccessToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  restoreSession();
-}, []);
+    restoreSession();
+  }, []);
 
   const login = (data) => {
     setAccessToken(data.data.accessToken);
@@ -41,6 +44,7 @@ const AuthProvider = ({ children }) => {
       value={{
         accessToken,
         user,
+        loading,
         login,
         logout,
       }}
@@ -54,9 +58,7 @@ const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthProvider",
-    );
+    throw new Error("useAuth must be used inside AuthProvider");
   }
 
   return context;

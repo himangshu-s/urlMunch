@@ -1,39 +1,50 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth.service";
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const { login } = useAuth();
-    const navigate = useNavigate();
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  try {
-    const data = await loginUser({
-      email,
-      password,
-    });
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-    login(data);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    navigate("/dashboard");
-  } catch (error) {
-    console.error(
-      "Login failed:",
-      error.response?.data || error.message,
-    );
-  }
-};
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await loginUser({
+        email,
+        password,
+      });
+
+      login(data);
+
+      navigate("/dashboard");
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Unable to log in. Please check your credentials.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
           <p className="eyebrow">urlMunch</p>
+
           <h1>Welcome back</h1>
+
           <p>Log in to manage your short links.</p>
         </div>
 
@@ -64,17 +75,19 @@ const handleSubmit = async (event) => {
             />
           </div>
 
+          {error && <p className="form-error">{error}</p>}
+
           <button
             type="submit"
             className="button button-primary auth-submit"
+            disabled={loading}
           >
-            Log in
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
 
         <p className="auth-footer">
-          Don't have an account?{" "}
-          <a href="/register">Create one</a>
+          Don't have an account? <Link to="/register">Create one</Link>
         </p>
       </div>
     </main>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { registerUser } from "../services/auth.service";
 
@@ -7,27 +7,37 @@ function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const { login } = useAuth();
-    const navigate = useNavigate();
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  try {
-    const data = await registerUser({
-      username,
-      email,
-      password,
-    });
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-    login(data);
-    navigate("/dashboard");
-  } catch (error) {
-    console.error(
-      "Registration failed:",
-      error.response?.data || error.message,
-    );
-  }
-};
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await registerUser({
+        username,
+        email,
+        password,
+      });
+
+      login(data);
+
+      navigate("/dashboard");
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Unable to create your account. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="auth-page">
@@ -37,9 +47,7 @@ const handleSubmit = async (event) => {
 
           <h1>Create your account</h1>
 
-          <p>
-            Start creating and managing your short links.
-          </p>
+          <p>Start creating and managing your short links.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -83,17 +91,19 @@ const handleSubmit = async (event) => {
             />
           </div>
 
+          {error && <p className="form-error">{error}</p>}
+
           <button
             type="submit"
             className="button button-primary auth-submit"
+            disabled={loading}
           >
-            Create account
+            {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
         <p className="auth-footer">
-          Already have an account?{" "}
-          <a href="/login">Log in</a>
+          Already have an account? <Link to="/login">Log in</Link>
         </p>
       </div>
     </main>

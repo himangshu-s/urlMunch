@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
+import MyLinks from "./pages/MyLinks";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="links" element={<MyLinks />} />
+          <Route path="analytics" element={<Analytics />} />
         </Route>
       </Routes>
     </BrowserRouter>
